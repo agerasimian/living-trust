@@ -152,7 +152,7 @@
         <select id="sntSame"><option value="yes">Same as successor trustee</option><option value="no">Someone different</option></select>
         <input type="text" id="sntTrustee" placeholder="Name (if different)" style="display:none;margin-top:6px">
         <label>When the special-needs beneficiary passes, the remainder goes to&hellip;</label>
-        <input type="text" id="sntRemainder" placeholder="e.g., my other children, equally">
+        <input type="text" id="sntRemainder" placeholder="name the person(s) only — the clause handles how it's held (e.g., my other child)">
       </div>
       <label>Ultimate backstop &mdash; if your entire family were gone, everything goes to&hellip;</label>
       <input type="text" id="backstop" placeholder="e.g., named relatives, or a charity">
@@ -184,6 +184,21 @@
       <label>Specific gifts before the split <span class="opt">(optional)</span></label>
       <div id="gifts"></div>
       <button type="button" class="add" id="addGift">+ Add a specific gift</button>
+    </div>
+
+    <div class="card">
+      <h2>6 &middot; If you can't act (power of attorney &amp; health directive)</h2>
+      <p class="hint">Who makes your <b>financial</b> and <b>medical</b> decisions if you're alive but unable to decide. Married: your spouse is automatically your first agent &mdash; just name backups. Single: the 1st choice is your primary agent. (The same people handle money and health care unless an attorney splits the roles.)</p>
+      <label>Agent &mdash; 1st choice <span class="opt">(this is your backup, if you're married)</span></label>
+      <input type="text" id="agent1" placeholder="Name (relationship)">
+      <label>Agent &mdash; next backup</label>
+      <input type="text" id="agent2" placeholder="Name (relationship)">
+      <label>End-of-life wishes (for the health-care directive)</label>
+      <select id="eolPref">
+        <option value="agent">Let my health-care agent decide</option>
+        <option value="comfort">Comfort care &mdash; don't prolong life if I'm dying or won't recover</option>
+        <option value="prolong">Prolong my life as long as reasonably possible</option>
+      </select>
     </div>
   </form>
 
@@ -273,7 +288,7 @@ function collect(){
     st1:$("st1").value, st2:$("st2").value, st3:$("st3").value, altExec:$("altExec").value,
     g1:$("g1").value, g2:$("g2").value,
     sntSame:$("sntSame").value, sntTrustee:$("sntTrustee").value, sntRemainder:$("sntRemainder").value,
-    backstop:$("backstop").value, protector:$("protector").value,
+    backstop:$("backstop").value, protector:$("protector").value, agent1:$("agent1").value, agent2:$("agent2").value, eolPref:$("eolPref").value,
     split:$("split").value, splitCustom:$("splitCustom").value,
     age1:$("age1").value||"25", age2:$("age2").value||"30", age3:$("age3").value||"35",
     smallTrust:$("smallTrust").value||"$50,000"
@@ -374,7 +389,11 @@ function buildDoc(d){
       `<p><b>7. Trustee — powers and protections.</b> The trustee may apply for, maximize, and advocate for the Beneficiary's benefits; hire a care manager or benefits specialist; acquire and hold a residence or vehicle for the Beneficiary's use; and petition a court for instructions. Acting in good faith to preserve eligibility, the trustee is <b>not liable</b> for any resulting loss or reduction of benefits and may take the Beneficiary's other resources into account. A person who is a <b>remainder beneficiary of this trust shall not serve as its trustee</b>; an independent or professional fiduciary is strongly preferred. The Trust Protector (above) may amend this trust to keep it eligibility-qualified as the law changes.</p>`+
       `<p><b>8. Spendthrift.</b> To the fullest extent allowed by law, the Beneficiary's interest may not be voluntarily or involuntarily transferred and is not reachable by any creditor — or by any governmental agency providing benefits or seeking reimbursement — before the trustee actually distributes it.</p>`+
       `<p><b>9. Retirement accounts.</b> If any IRA, Roth, or 401(k) names this trust, it must qualify as a see-through <b>"applicable multi-beneficiary trust"</b> under the SECURE Act so ${bene} keeps the lifetime (not 10-year) payout — confirm the language with the attorney and the plan custodian.</p>`+
-      `<p><b>10. No payback; remainder.</b> Because this trust is third-party funded, on ${bene}'s death the State has <b>no Medi-Cal reimbursement claim</b>, and the remaining balance passes to ${B(d.sntRemainder,"remainder beneficiaries")}, free of trust.</p>`;
+      `<p><b>10. No payback; remainder.</b> Because this trust is third-party funded with only the ${settlorWord.toLowerCase()}' property, on ${bene}'s death the State has <b>no Medicaid, Medi-Cal, or other reimbursement claim</b> against this trust and no part of the remainder is payable to any benefits agency. After the trustee pays or reserves only for this trust's own administration, wind-up, compensation, and taxes properly chargeable to it (which never include any governmental reimbursement), the trustee shall distribute the remaining balance as follows:</p>`+
+      `<p class="sub">(a) To ${B(d.sntRemainder,"the remainder beneficiary")}, if then living and surviving ${bene} by 30 days. <b>Disability protection:</b> if any taker under (a) is then receiving (or the trustee reasonably expects to qualify for) needs-based public benefits, or an outright gift would impair them — or that taker is then a minor — the trustee shall not distribute outright but shall hold that share in a separate, irrevocable, third-party special-needs trust on terms substantially like this Article (for a benefits-eligible taker), or until majority (for a minor).</p>`+
+      `<p class="sub">(b) If no taker under (a) survives ${bene} by 30 days, to the ${settlorWord.toLowerCase()}' then-living descendants, by representation (Probate Code §240), subject to the same disability and minority protection.</p>`+
+      `<p class="sub">(c) If none, to ${B(d.backstop,"the ultimate backstop")}. This is a self-contained terminal gift and does not depend on any other article of this trust remaining unexhausted.</p>`+
+      `<p>This paragraph alone governs this trust's remainder. No remainder taker has any enforceable interest during ${bene}'s life — only an expectancy taking effect at ${bene}'s death — and <b>in no event</b> may any part of the remainder pass to or for ${bene} or back into this Supplemental Needs Trust. Consistent with the conflict rule above, <b>no remainder taker under this paragraph may serve as trustee of this trust</b>; if a named successor trustee would be disqualified, the next eligible independent or professional fiduciary serves. Every interest under this paragraph shall vest, if at all, within the period allowed by Probate Code §§21205–21209, failing which the trustee shall distribute it outright to those then entitled.</p>`;
   }
 
   // trustees
@@ -424,6 +443,41 @@ function buildDoc(d){
   let wills = `<hr class="pagebreak"><div class="warnbox" style="text-align:center">Pour-over will${d.married?"s":""} — sign separately, each before <b>two disinterested witnesses</b>.</div>`+ will(d.you, d.spouse);
   if(d.married) wills += `<hr class="pagebreak">`+ will(d.spouse, d.you);
 
+  // ---- durable power of attorney + advance health care directive ----
+  const caNotary = who => `<div class="note"><b>California notary acknowledgment.</b> "A notary public or other officer completing this certificate verifies only the identity of the individual who signed the document to which this certificate is attached, and not the truthfulness, accuracy, or validity of that document." State of California, County of __________. On __________ before me, __________ (notary), personally appeared ${who}, who proved to me on satisfactory evidence to be the person whose name is subscribed, and acknowledged executing it. I certify under PENALTY OF PERJURY under California law that the foregoing is true. WITNESS my hand and official seal. ____________ (Seal)</div>`;
+  function agentLine(list){ const a=list.filter(x=>x&&x.trim()); return {first:a.length?`<b>${esc(a[0])}</b>`:`<span class="blank">[agent]</span>`, rest:a.slice(1).map(esc)}; }
+  function poa(principal, list){
+    const {first,rest}=agentLine(list);
+    return `<hr class="pagebreak"><h2>Durable power of attorney for finances &mdash; ${B(principal,"name")}</h2>`+
+      `<div class="warnbox">California durable power of attorney. <b>Sign before a notary.</b> This covers money and acts <em>outside</em> the living trust (retirement accounts, taxes, government benefits, even moving assets into the trust); it ends at your death, when your trust and will take over.</div>`+
+      `<p>I, ${B(principal,"name")}, a resident of ${B(d.county,"county")} County, California, appoint ${first} as my agent (attorney-in-fact) for financial matters.`+(rest.length?` If that agent cannot or will not serve, I appoint, in order: ${rest.join("; ")}.`:"")+`</p>`+
+      `<p><b>Durable.</b> This power of attorney is <b>durable</b> &mdash; not affected by my later incapacity (California Probate Code §4124) &mdash; and is effective immediately.</p>`+
+      `<p><b>Authority.</b> My agent may act for me in: real-property and personal-property transactions; bank, brokerage, and other financial-institution transactions; retirement-plan and IRA matters; tax matters (including signing returns and dealing with the IRS and Franchise Tax Board); government benefits; insurance and annuities; claims and litigation; business interests; and transferring my property into my living trust. My agent has the powers described in California Probate Code §§4450&ndash;4465 for these subjects.</p>`+
+      `<p><b>Standard.</b> My agent shall act in good faith, in my best interest, within this authority, and shall keep records. No bond is required, and third parties may rely on this document.</p>`+
+      `<p>Signed on ____________________, 20____, at ${B(d.county,"city")}, California.</p>`+
+      `<div class="sig"><div class="sigline">${B(principal,"name")}, Principal</div></div>`+
+      caNotary(B(principal,"name"));
+  }
+  function ahcd(principal, list){
+    const {first,rest}=agentLine(list);
+    const eol={comfort:"I do <b>not</b> want my life prolonged, and I do not want treatment that only postpones death, if (a) I have an incurable, irreversible condition that will result in death within a relatively short time, (b) I become unconscious and am not expected to regain consciousness, or (c) the risks and burdens of treatment would outweigh the expected benefits. I want comfort care and relief from pain.",prolong:"I want my life prolonged as long as reasonably possible within generally accepted health-care standards.",agent:"I want my health-care agent to make these decisions, weighing my comfort, dignity, and the benefits and burdens of treatment."}[d.eolPref||"agent"];
+    return `<hr class="pagebreak"><h2>Advance health care directive &mdash; ${B(principal,"name")}</h2>`+
+      `<div class="warnbox">California Advance Health Care Directive (Probate Code §4701). <b>Sign before a notary OR two qualified witnesses</b> (a witness may not be your agent or your health-care provider; at least one witness must not be related to you and not entitled to your estate).</div>`+
+      `<p><b>Part 1 &mdash; my health-care agent.</b> I, ${B(principal,"name")}, appoint ${first} as my health-care agent to make health-care decisions for me when my primary physician determines I cannot make them myself.`+(rest.length?` If that agent cannot or will not serve, I appoint, in order: ${rest.join("; ")}.`:"")+`</p>`+
+      `<p>My agent may consent to, refuse, or withdraw any care, treatment, service, or procedure; choose and discharge providers and facilities; and receive my medical information. Any limits on this authority: [none, or state them: __________].</p>`+
+      `<p><b>Part 2 &mdash; end-of-life wishes.</b> ${eol}</p>`+
+      `<p><b>Part 3 &mdash; pain relief, HIPAA, other.</b> I want treatment to keep me comfortable and to relieve pain, even if it hastens death. I authorize my agent and my providers to release my protected health information to carry out this directive (HIPAA, 45 C.F.R. §164.508). Organ donation / other wishes: [state any, or "none"].</p>`+
+      `<p>Signed on ____________________, 20____, at ${B(d.county,"city")}, California.</p>`+
+      `<div class="sig"><div class="sigline">${B(principal,"name")}</div></div>`+
+      `<div class="note"><b>Two-witness option</b> (if not notarized): each witness signs that the principal signed in their presence, appears of sound mind and free of duress, and that the witness is not the appointed agent or the principal's health-care provider/employee; at least one witness also states they are not related to the principal and not entitled to any part of the estate.<br><br>Witness 1: signature ____________ name ____________ &nbsp;&nbsp; Witness 2: signature ____________ name ____________</div>`+
+      caNotary(B(principal,"name"));
+  }
+  const agentBackups=[d.agent1,d.agent2];
+  const directives = `<a id="sec-poa"></a>`+
+    (d.married ? poa(d.you,[d.spouse,...agentBackups]) + poa(d.spouse,[d.you,...agentBackups]) : poa(d.you, agentBackups))
+    + `<a id="sec-ahcd"></a>`+
+    (d.married ? ahcd(d.you,[d.spouse,...agentBackups]) + ahcd(d.spouse,[d.you,...agentBackups]) : ahcd(d.you, agentBackups));
+
   // ---- certification of trust ----
   const cert = `<hr class="pagebreak"><h2>Certification of trust (Probate Code §18100.5)</h2>`+
     `<p>The undersigned trustee certifies: (1) ${trustTitle(d)} exists, dated ____________, and is in effect. (2) The settlor${d.married?"s are":" is"} ${settlorsPhrase(d)}. (3) The acting trustee${d.married?"s are":" is"} ${settlorsPhrase(d)}. (4) The trustee has full power to acquire, hold, manage, sell, encumber, and convey trust assets and to open and operate accounts. (5) The trust is revocable. (6) Title is taken as: <em>"${titleVesting(d)}."</em> (7) The trust has not been revoked or modified in any way making this certification incorrect.</p>`+
@@ -438,6 +492,8 @@ function buildDoc(d){
     `<ol class="toc">`+
       `<li><a href="#sec-trust"><b>The revocable living trust</b> &mdash; the main document (all articles &amp; Schedule A)</a></li>`+
       `<li><a href="#sec-wills">Pour-over will${d.married?"s (one per spouse)":""}</a></li>`+
+      `<li><a href="#sec-poa">Durable power of attorney for finances${d.married?" (one per spouse)":""}</a></li>`+
+      `<li><a href="#sec-ahcd">Advance health care directive${d.married?" (one per spouse)":""}</a></li>`+
       `<li><a href="#sec-cert">Certification of trust &mdash; the short page you hand to banks</a></li>`+
       `<li><a href="#sec-assignment">Assignment of personal property</a></li>`+
       `<li><a href="#sec-funding">Funding &amp; execution checklist</a></li>`+
@@ -502,8 +558,8 @@ function buildDoc(d){
     `<ul class="ck"><li>&#9744; Store the signed originals safely; hand institutions the Certification of Trust, not the whole trust.</li>`+
     `<li>&#9744; Tell your successor trustee${hasMinor?" and guardian":""} they're named and where the documents are.</li>`+
     `<li>&#9744; Review every 3–5 years and after any birth, death, marriage, divorce, big asset change, or move.</li></ul>`+
-    `<h3>Recommended companions (not included here)</h3>`+
-    `<p>For ${d.married?"each spouse":"you"}: an <b>Advance Health Care Directive</b> (Probate Code §4701), a <b>Durable Power of Attorney for finances</b>, and a <b>HIPAA authorization</b> — these cover incapacity, which the trust only partly handles.</p>`;
+    `<h3>Incapacity documents (included in this package)</h3>`+
+    `<p>For ${d.married?"each spouse":"you"}, this package now includes a <b>Durable Power of Attorney for finances</b> and an <b>Advance Health Care Directive</b> (with HIPAA authorization built in) — see those sections above. Sign the power of attorney before a <b>notary</b>, and the health-care directive before a <b>notary or two qualified witnesses</b>.</p>`;
 
   const maintenance = `<hr class="pagebreak"><h2>Trust maintenance — cheat sheet</h2>`+
     `<p><b>The 30-second version:</b> fund it once, title big new things in its name as you get them, and glance at it every few years. No annual filing, no fee, no registration, no separate tax return while you're ${d.married?"both ":""}alive.</p>`+
@@ -527,6 +583,7 @@ function buildDoc(d){
   return cover
     + `<a id="sec-trust"></a>` + arts
     + `<a id="sec-wills"></a>` + wills
+    + directives
     + `<a id="sec-cert"></a>` + cert
     + `<a id="sec-assignment"></a>` + assignment
     + `<a id="sec-funding"></a>` + funding
@@ -563,7 +620,7 @@ function save(){
     try{
       const d=collect();
       localStorage.setItem("catrust", JSON.stringify({d, bens, assets, gifts,
-        fields:["you","spouse","county","surname","st1","st2","st3","altExec","g1","g2","sntSame","sntTrustee","sntRemainder","backstop","protector","split","splitCustom","age1","age2","age3","smallTrust"].reduce((o,k)=>(o[k]=$(k).value,o),{}),
+        fields:["you","spouse","county","surname","st1","st2","st3","altExec","g1","g2","sntSame","sntTrustee","sntRemainder","backstop","protector","split","splitCustom","age1","age2","age3","smallTrust","agent1","agent2","eolPref"].reduce((o,k)=>(o[k]=$(k).value,o),{}),
         married:d.married}));
       $("saveState").textContent="saved in your browser ✓";
     }catch(e){ $("saveState").textContent="(couldn't save locally)"; }
@@ -583,7 +640,7 @@ const SAMPLE = {
     st1:"Maria Lopez (sister)",st2:"James Rivera (brother)",st3:"a licensed professional fiduciary",
     altExec:"Maria Lopez (sister)",g1:"Maria Lopez (sister)",g2:"James Rivera (brother)",
     sntSame:"yes",sntTrustee:"",sntRemainder:"my other child, in their sub-trust",
-    backstop:"my and my spouse's heirs at law",protector:"Dana Kim (trusted family friend)",split:"equal",splitCustom:"",age1:"25",age2:"30",age3:"35",smallTrust:"$50,000"},
+    backstop:"my and my spouse's heirs at law",protector:"Dana Kim (trusted family friend)",split:"equal",splitCustom:"",age1:"25",age2:"30",age3:"35",smallTrust:"$50,000",agent1:"Maria Lopez (sister)",agent2:"James Rivera (brother)",eolPref:"comfort"},
   married:true,
   bens:[{name:"Alex Rivera",year:"2017",cat:"minor"},{name:"Casey Rivera",year:"2018",cat:"sn"}],
   assets:[{type:"Real property",last4:"",desc:"Condominium at 12 Palm Ct, Irvine, CA; APN 123-456-78",value:"$650,000",char:"Community"},
@@ -618,8 +675,8 @@ document.addEventListener("click", e=>{
   }
   if(t.id==="loadDemo"){ restore(SAMPLE); update(); }
   if(t.id==="clearBtn"){ if(confirm("Clear everything and start over?")){ localStorage.removeItem("catrust"); bens=[];assets=[];gifts=[];
-      ["you","spouse","county","surname","st1","st2","st3","altExec","g1","g2","sntTrustee","sntRemainder","backstop","protector","splitCustom"].forEach(k=>$(k).value="");
-      $("split").value="equal";$("sntSame").value="yes";$("age1").value="25";$("age2").value="30";$("age3").value="35";$("smallTrust").value="$50,000";
+      ["you","spouse","county","surname","st1","st2","st3","altExec","g1","g2","sntTrustee","sntRemainder","backstop","protector","splitCustom","agent1","agent2"].forEach(k=>$(k).value="");
+      $("split").value="equal";$("sntSame").value="yes";$("age1").value="25";$("age2").value="30";$("age3").value="35";$("smallTrust").value="$50,000";$("eolPref").value="agent";
       document.querySelector('input[name=married][value=no]').checked=true;
       renderBens();renderAssets();renderGifts();update(); } }
 });
