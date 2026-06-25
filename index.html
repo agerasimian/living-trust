@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>California Living Trust Builder</title>
+<style>
+  :root{
+    --bg:#f7f6f3; --card:#fff; --ink:#1d1d1b; --muted:#6b6a64; --line:#e2e0d8;
+    --accent:#2f6f5e; --accent-ink:#fff; --warn-bg:#fcecec; --warn-line:#e0a3a3; --warn-ink:#8a1f1f;
+    --blank-bg:#fff3cd; --blank-ink:#7a5b00; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  header.app{padding:20px 22px;background:#fff;border-bottom:1px solid var(--line)}
+  header.app h1{margin:0 0 2px;font-size:20px}
+  header.app p{margin:0;color:var(--muted);font-size:13px}
+  .disclaimer{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn-ink);
+       border-radius:var(--radius);padding:12px 14px;margin:14px 22px;font-size:13px}
+  .disclaimer b{font-weight:600}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;padding:0 22px 120px;align-items:start}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+  .card h2{margin:0 0 4px;font-size:16px}
+  .card .hint{color:var(--muted);font-size:13px;margin:0 0 12px}
+  label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+  label .opt{font-weight:400;color:var(--muted)}
+  input[type=text],input[type=number],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);
+       border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{min-height:60px;resize:vertical}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  fieldset{border:1px solid var(--line);border-radius:8px;margin:8px 0;padding:8px 12px}
+  legend{font-size:12px;color:var(--muted);padding:0 6px}
+  .radio{display:inline-flex;gap:6px;align-items:center;font-weight:400;margin-right:16px}
+  .row{border:1px dashed var(--line);border-radius:8px;padding:10px;margin:8px 0;position:relative}
+  .row .rm{position:absolute;top:6px;right:6px;border:0;background:#f0efe9;border-radius:6px;cursor:pointer;
+       font-size:12px;padding:3px 8px;color:var(--muted)}
+  .row .rm:hover{background:#e7e6df}
+  .add{margin-top:8px;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:8px;
+       padding:8px 12px;cursor:pointer;font:inherit;font-weight:600}
+  .add:hover{background:#eef5f2}
+  .toolbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+       padding:10px 22px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:20}
+  .toolbar .grow{flex:1;min-width:140px;color:var(--muted);font-size:12px}
+  .btn{border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font:inherit;font-weight:600}
+  .btn.primary{background:var(--accent);color:var(--accent-ink)}
+  .btn.primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:#f0efe9;color:var(--ink)}
+  .ack{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted);max-width:340px}
+  .ack input{margin-top:3px}
+  .previewhead{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .previewhead h2{font-size:16px;margin:0}
+  .previewhead span{font-size:12px;color:var(--muted)}
+  /* the generated document */
+  #paper{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:46px 52px;
+       font-family:Georgia,"Times New Roman",serif;font-size:13px;line-height:1.5;color:#181818;
+       box-shadow:0 1px 0 rgba(0,0,0,.03)}
+  #paper h1{font-size:20px;text-align:center;margin:0 0 2px}
+  #paper .docsub{text-align:center;color:#555;font-size:12px;margin:0 0 18px}
+  #paper h2{font-size:15px;border-bottom:1px solid #999;padding-bottom:3px;margin:22px 0 8px}
+  #paper h3{font-size:13px;margin:16px 0 6px}
+  #paper p{margin:7px 0}
+  #paper .sub{margin:6px 0 6px 18px}
+  #paper table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11px}
+  #paper th,#paper td{border:1px solid #999;padding:4px 6px;text-align:left;vertical-align:top}
+  #paper th{background:#eee}
+  #paper .sig{margin-top:26px}
+  #paper .sigline{border-top:1px solid #333;width:60%;margin-top:30px;padding-top:3px;font-size:11px}
+  #paper .note{background:#f4f1e7;border-left:3px solid #c9a227;padding:6px 10px;margin:8px 0;font-size:11.5px;color:#4a4426}
+  #paper .warnbox{background:#fcecec;border:1px solid #e0a3a3;color:#8a1f1f;padding:10px 12px;border-radius:6px;font-size:11.5px;margin:10px 0}
+  #paper .pagebreak{border:0;border-top:2px dashed #ccc;margin:26px 0}
+  #paper h4{font-size:12.5px;margin:13px 0 4px}
+  #paper ul.ck{list-style:none;padding-left:2px;margin:8px 0}
+  #paper ul.ck li{margin:4px 0;padding-left:2px}
+  #paper ol.toc{margin:8px 0;padding-left:22px}
+  #paper ol.toc li{margin:5px 0}
+  #paper ol.toc a{color:#14366b;text-decoration:none}
+  .blank{background:var(--blank-bg);color:var(--blank-ink);border-radius:3px;padding:0 4px;font-style:italic;font-family:inherit}
+  @media print{
+    header.app,.disclaimer,.toolbar,form,.previewhead{display:none!important}
+    .wrap{display:block;padding:0}
+    #paper{border:0;box-shadow:none;border-radius:0;padding:0;font-size:11.5pt}
+    #paper .pagebreak{break-after:page;border:0;margin:0}
+    .blank{background:transparent;color:#000;font-style:normal}
+    @page{size:Letter;margin:0.9in}
+  }
+</style>
+</head>
+<body>
+<header class="app">
+  <h1>California Living Trust Builder</h1>
+  <p>Fill in the form &rarr; a ready-to-review trust appears on the right &rarr; print or save as PDF. Everything stays in your browser.</p>
+</header>
+
+<div class="disclaimer">
+  <b>This is a self-help template, not legal advice, and not a law firm.</b> Using it creates no attorney–client relationship.
+  It is built for <b>California</b> only and for straightforward estates. Please have a California estate attorney review it before signing —
+  especially if anyone has <b>special needs</b>, you have a blended family, a taxable estate (over ~$15M), or business interests.
+  A trust does nothing until it is <b>signed &amp; notarized</b> and <b>funded</b> (assets retitled into it).
+</div>
+
+<div class="wrap">
+  <form id="form" autocomplete="off">
+
+    <div class="card">
+      <h2>1 &middot; About you</h2>
+      <p class="hint">The person creating the trust. If you're married, you'll create one joint trust together.</p>
+      <label>Your full legal name</label>
+      <input type="text" id="you" placeholder="e.g., Jordan Alex Rivera">
+      <fieldset><legend>Marital status</legend>
+        <label class="radio"><input type="radio" name="married" value="yes"> Married (joint trust)</label>
+        <label class="radio"><input type="radio" name="married" value="no" checked> Single (individual trust)</label>
+      </fieldset>
+      <div id="spouseWrap" style="display:none">
+        <label>Spouse's full legal name</label>
+        <input type="text" id="spouse" placeholder="e.g., Sam Taylor Rivera">
+      </div>
+      <div class="two">
+        <div><label>California county you live in</label><input type="text" id="county" placeholder="e.g., Orange"></div>
+        <div><label>Last name for the trust's title</label><input type="text" id="surname" placeholder="e.g., Rivera"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2 &middot; Children &amp; beneficiaries</h2>
+      <p class="hint">Who inherits when you're gone. Mark each one so the trust knows how to hold their share.</p>
+      <div id="bens"></div>
+      <button type="button" class="add" id="addBen">+ Add a beneficiary</button>
+    </div>
+
+    <div class="card">
+      <h2>3 &middot; The people you appoint</h2>
+      <p class="hint">The most important choices. Pick a first choice and a backup, and talk to them first.</p>
+      <label>Successor trustee &mdash; manages everything if you're gone (1st choice)</label>
+      <input type="text" id="st1" placeholder="Name (relationship)">
+      <label>Successor trustee &mdash; backup</label>
+      <input type="text" id="st2" placeholder="Name (relationship)">
+      <label>Final backstop trustee <span class="opt">(optional &mdash; e.g., a bank/professional fiduciary)</span></label>
+      <input type="text" id="st3" placeholder="Optional">
+      <label>Alternate executor for the will(s) <span class="opt">(used only if you're all gone)</span></label>
+      <input type="text" id="altExec" placeholder="Name (relationship)">
+      <div id="guardianWrap" style="display:none">
+        <label>Guardian for minor children &mdash; raises them if you both die (1st choice)</label>
+        <input type="text" id="g1" placeholder="Name (relationship)">
+        <label>Guardian &mdash; backup</label>
+        <input type="text" id="g2" placeholder="Name (relationship)">
+      </div>
+      <div id="snWrap" style="display:none">
+        <label>Special-needs-trust trustee</label>
+        <select id="sntSame"><option value="yes">Same as successor trustee</option><option value="no">Someone different</option></select>
+        <input type="text" id="sntTrustee" placeholder="Name (if different)" style="display:none;margin-top:6px">
+        <label>When the special-needs beneficiary passes, the remainder goes to&hellip;</label>
+        <input type="text" id="sntRemainder" placeholder="e.g., my other children, equally">
+      </div>
+      <label>Ultimate backstop &mdash; if your entire family were gone, everything goes to&hellip;</label>
+      <input type="text" id="backstop" placeholder="e.g., named relatives, or a charity">
+      <label>Trust protector <span class="opt">(optional, recommended) &mdash; can replace a trustee and update the special-needs trust as laws change</span></label>
+      <input type="text" id="protector" placeholder="e.g., a trusted relative or your attorney (not a trust beneficiary)">
+    </div>
+
+    <div class="card">
+      <h2>4 &middot; Assets to put in the trust</h2>
+      <p class="hint">List the big ones. Use last-4 only &mdash; never full account numbers or SSNs.</p>
+      <div id="assets"></div>
+      <button type="button" class="add" id="addAsset">+ Add an asset</button>
+    </div>
+
+    <div class="card">
+      <h2>5 &middot; Choices</h2>
+      <p class="hint">Sensible defaults are pre-set &mdash; change them only if you want to.</p>
+      <label>Split between beneficiaries</label>
+      <select id="split"><option value="equal">Equal shares</option><option value="custom">Custom (describe below)</option></select>
+      <input type="text" id="splitCustom" placeholder="e.g., 50% to Alex, 30% to Casey, 20% to Sam" style="display:none;margin-top:6px">
+      <label>Payout ages for a young beneficiary's share</label>
+      <div class="three">
+        <div><input type="number" id="age1" value="25"><div class="hint">⅓ at this age</div></div>
+        <div><input type="number" id="age2" value="30"><div class="hint">½ of rest at</div></div>
+        <div><input type="number" id="age3" value="35"><div class="hint">balance at</div></div>
+      </div>
+      <label>Small-trust buyout threshold</label>
+      <input type="text" id="smallTrust" value="$50,000">
+      <label>Specific gifts before the split <span class="opt">(optional)</span></label>
+      <div id="gifts"></div>
+      <button type="button" class="add" id="addGift">+ Add a specific gift</button>
+    </div>
+  </form>
+
+  <div>
+    <div class="previewhead"><h2>Live preview</h2><span id="saveState">saved in your browser</span></div>
+    <div id="paper"></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="grow" id="missing"></div>
+  <label class="ack"><input type="checkbox" id="ack"> I understand this is a self-help template, not legal advice, and I will have it reviewed before signing.</label>
+  <button class="btn ghost" id="loadDemo" type="button">Load example</button>
+  <button class="btn ghost" id="clearBtn" type="button">Clear</button>
+  <button class="btn primary" id="printBtn" type="button" disabled>Print / Save as PDF</button>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+// value-or-visible-blank
+const B = (v,label) => (v && String(v).trim()) ? esc(v.trim()) : `<span class="blank">[${esc(label)}]</span>`;
+
+let bens = [], assets = [], gifts = [];
+
+/* ---------- dynamic rows ---------- */
+function renderBens(){
+  $("bens").innerHTML = bens.map((b,i)=>`
+    <div class="row">
+      <button type="button" class="rm" data-rm="ben" data-i="${i}">remove</button>
+      <div class="two">
+        <div><label>Full name</label><input type="text" data-k="name" data-list="ben" data-i="${i}" value="${esc(b.name)}" placeholder="e.g., Alex Rivera"></div>
+        <div><label>Birth year <span class="opt">(optional)</span></label><input type="text" data-k="year" data-list="ben" data-i="${i}" value="${esc(b.year)}" placeholder="e.g., 2017"></div>
+      </div>
+      <label>How should their share be held?</label>
+      <select data-k="cat" data-list="ben" data-i="${i}">
+        <option value="adult" ${b.cat==="adult"?"selected":""}>Adult &mdash; give outright</option>
+        <option value="minor" ${b.cat==="minor"?"selected":""}>Minor / young &mdash; hold &amp; pay out at set ages</option>
+        <option value="sn" ${b.cat==="sn"?"selected":""}>Special needs &mdash; lifetime supplemental trust</option>
+      </select>
+    </div>`).join("");
+}
+function renderAssets(){
+  $("assets").innerHTML = assets.map((a,i)=>`
+    <div class="row">
+      <button type="button" class="rm" data-rm="asset" data-i="${i}">remove</button>
+      <div class="two">
+        <div><label>Type</label>
+          <select data-k="type" data-list="asset" data-i="${i}">
+            <option ${a.type==="Real property"?"selected":""}>Real property</option>
+            <option ${a.type==="Bank account"?"selected":""}>Bank account</option>
+            <option ${a.type==="Brokerage account"?"selected":""}>Brokerage account</option>
+            <option ${a.type==="Other"?"selected":""}>Other</option>
+          </select></div>
+        <div><label>Last 4 <span class="opt">(if account)</span></label><input type="text" data-k="last4" data-list="asset" data-i="${i}" value="${esc(a.last4)}" maxlength="4" placeholder="1234"></div>
+      </div>
+      <label>Description</label>
+      <input type="text" data-k="desc" data-list="asset" data-i="${i}" value="${esc(a.desc)}" placeholder="e.g., Condo at 12 Palm Ct, APN 123-456-78 / Chase checking">
+      <div class="two">
+        <div><label>Approx. value <span class="opt">(optional)</span></label><input type="text" data-k="value" data-list="asset" data-i="${i}" value="${esc(a.value)}" placeholder="$"></div>
+        <div><label>Character</label>
+          <select data-k="char" data-list="asset" data-i="${i}">
+            <option value="Community" ${a.char==="Community"?"selected":""}>Community</option>
+            <option value="Separate" ${a.char==="Separate"?"selected":""}>Separate</option>
+          </select></div>
+      </div>
+    </div>`).join("");
+}
+function renderGifts(){
+  $("gifts").innerHTML = gifts.map((g,i)=>`
+    <div class="row">
+      <button type="button" class="rm" data-rm="gift" data-i="${i}">remove</button>
+      <div class="two">
+        <div><label>Gift (amount or item)</label><input type="text" data-k="what" data-list="gift" data-i="${i}" value="${esc(g.what)}" placeholder="e.g., $10,000"></div>
+        <div><label>To</label><input type="text" data-k="to" data-list="gift" data-i="${i}" value="${esc(g.to)}" placeholder="Name"></div>
+      </div>
+    </div>`).join("");
+}
+
+/* ---------- collect ---------- */
+function collect(){
+  const married = document.querySelector('input[name=married]:checked').value==="yes";
+  return {
+    you:$("you").value, married, spouse:$("spouse").value, county:$("county").value, surname:$("surname").value,
+    bens:bens.slice(), assets:assets.slice(), gifts:gifts.filter(g=>g.what||g.to),
+    st1:$("st1").value, st2:$("st2").value, st3:$("st3").value, altExec:$("altExec").value,
+    g1:$("g1").value, g2:$("g2").value,
+    sntSame:$("sntSame").value, sntTrustee:$("sntTrustee").value, sntRemainder:$("sntRemainder").value,
+    backstop:$("backstop").value, protector:$("protector").value,
+    split:$("split").value, splitCustom:$("splitCustom").value,
+    age1:$("age1").value||"25", age2:$("age2").value||"30", age3:$("age3").value||"35",
+    smallTrust:$("smallTrust").value||"$50,000"
+  };
+}
+
+/* ---------- document builder ---------- */
+function trustTitle(d){
+  const fam = (d.married || d.bens.length) ? "Family " : "";
+  return `The ${B(d.surname,"surname")} ${fam}Revocable Living Trust`;
+}
+function settlorsPhrase(d){
+  return d.married ? `${B(d.you,"your name")} and ${B(d.spouse,"spouse's name")}` : `${B(d.you,"your name")}`;
+}
+function titleVesting(d){
+  return d.married
+    ? `${B(d.you,"your name")} and ${B(d.spouse,"spouse")}, Trustees of ${trustTitle(d)} dated ____________`
+    : `${B(d.you,"your name")}, Trustee of ${trustTitle(d)} dated ____________`;
+}
+function successorList(d){
+  const items=[d.st1,d.st2,d.st3].map((x,i)=>x&&x.trim()?`<li>${esc(x)}</li>`:(i<2?`<li><span class="blank">[successor trustee ${i+1}]</span></li>`:"")).join("");
+  return `<ol>${items}</ol>`;
+}
+
+function buildDoc(d){
+  const hasMinor = d.bens.some(b=>b.cat==="minor");
+  const hasSN = d.bens.some(b=>b.cat==="sn");
+  const sntTrustee = d.sntSame==="no" ? B(d.sntTrustee,"special-needs trustee") : "the successor trustee named above";
+  const splitText = d.split==="custom" ? B(d.splitCustom,"describe the split") : "in equal shares, one share for each beneficiary";
+  let n=0; const H=t=>`<h2>Article ${++n} &mdash; ${t}</h2>`;
+  const we = d.married?"we":"I", our=d.married?"our":"my", us=d.married?"us":"me", settlorWord=d.married?"Settlors":"Settlor";
+
+  let arts="";
+
+  // creation
+  arts += H("Creation of trust")+
+    `<p>${B(d.you,"your name")}${d.married?` and ${B(d.spouse,"spouse's name")}`:""} (the "${settlorWord}") create ${trustTitle(d)} and serve as the initial trustee${d.married?"s":""}. The ${settlorWord.toLowerCase()} declare that the property listed in Schedule A, and any property later added, is held in trust on these terms. For titling assets use: <em>"${titleVesting(d)}, and their successors in trust."</em></p>`+
+    `<p>${d.married?"We are married to each other.":""} ${our.charAt(0).toUpperCase()+our.slice(1)} ${d.bens.length===1?"beneficiary is":"beneficiaries are"}: ${d.bens.length? d.bens.map(b=>`${B(b.name,"name")}${b.year?` (born ${esc(b.year)})`:""}`).join(", "): `<span class="blank">[add beneficiaries]</span>`}.</p>`;
+
+  // trust property + community
+  arts += H("Trust property")+
+    `<p>The ${settlorWord.toLowerCase()} transfer to the trust the property in Schedule A and any later-added property.</p>`+
+    (d.married?`<p>This is a California community-property trust. Community property transferred here keeps its community-property character (including the full step-up in basis on the first death under IRC §1014(b)(6)); separate property keeps its separate character. Transferring property into the trust does not by itself change its character.</p>`:"")+
+    `<p>While revocable, this is a grantor trust: it uses the ${settlorWord.toLowerCase()}' Social Security number, files no separate return, and reports income on the ${settlorWord.toLowerCase()}' personal return.</p>`;
+
+  // revocability
+  arts += H("Reservation of rights (revocable)")+
+    `<p>This trust is revocable and amendable ${d.married?"by the Settlors (both acting together as to community property; each alone as to that Settlor's separate property), by a signed writing delivered to the trustee (Probate Code §15401)":"by the Settlor at any time, by a signed writing delivered to the trustee"}. It becomes irrevocable on the death of ${d.married?"the surviving Settlor":"the Settlor"}.</p>`;
+
+  // lifetime
+  arts += H(`Use during ${our} lifetime${d.married?"s":""}`)+
+    `<p>While living, the trustee shall pay the ${settlorWord.toLowerCase()} as much income and principal as ${we} direct, and otherwise as needed for ${our} health, education, support, and maintenance in ${our} accustomed standard of living.</p>`;
+
+  // incapacity
+  arts += H("Incapacity")+
+    `<p>A ${settlorWord.toLowerCase()} is incapacitated if a court so finds or a licensed physician who has examined the ${settlorWord.toLowerCase()} certifies in writing that the person cannot manage their financial affairs; each ${settlorWord.toLowerCase()} authorizes the successor trustee to obtain the medical information needed for that determination (a HIPAA authorization). During incapacity, ${d.married?"the other Settlor (or, if both are incapacitated, the successor trustee)":"the successor trustee"} manages the trust and uses it for the incapacitated person's care and for anyone they support, avoiding the need for a conservatorship.</p>`;
+
+  // first death (married only)
+  if(d.married){
+    arts += H("Death of the first spouse")+
+      `<p>On the first death, the surviving Settlor continues as sole trustee and the trust estate is held as one trust that the survivor may use and amend in full, with the maximum flexibility and a full basis step-up on community property. The trustee pays the deceased Settlor's enforceable debts and expenses in an orderly way out of trust assets (see the debts provision below) rather than leaving them to be pursued against the survivor personally. On the survivor's death the trust becomes irrevocable and is distributed as set out below.</p>`+
+      `<div class="note"><b>Two items to take up with an attorney.</b> (1) <b>Portability:</b> because there is no bypass trust, the surviving spouse should consider a timely federal estate-tax <b>portability (DSUE) election on Form 706</b> after the first death to preserve the deceased spouse's exemption. (2) <b>Whether to lock the plan:</b> the survivor's full control means the survivor can later redirect assets &mdash; including away from the children or the special-needs trust. A family whose main goal is protecting a disabled child often makes the special-needs framework irrevocable at the first death (or funds a separate irrevocable special-needs trust then); a blended family may want a Survivor's/Bypass split.</div>`;
+  }
+
+  // distribution
+  arts += H(`Distribution after ${d.married?"both deaths":"death"}`)+
+    `<p><b>Debts, expenses, taxes.</b> The trustee shall pay enforceable debts, last-illness and funeral expenses, administration costs, and any death taxes — first from life-insurance proceeds payable to the trust and other liquid assets, then from the residue, reaching a beneficiary's held share only if other assets are insufficient.</p>`+
+    `<p><b>No exoneration of secured property.</b> Consistent with Probate Code §21131, any property subject to a mortgage or lien passes subject to that debt without right of exoneration; the trustee shall not pay it off from other assets unless the trustee finds it in the beneficiaries' interest.</p>`+
+    `<p><b>Creditor claims.</b> The trustee may use the optional procedure of Probate Code §§19000 et seq. to give notice and bar late creditor claims.</p>`+
+    (d.gifts.length?`<p><b>Specific gifts</b> (if the recipient survives by 30 days):</p><table><tr><th>Gift</th><th>To</th></tr>${d.gifts.map(g=>`<tr><td>${B(g.what,"gift")}</td><td>${B(g.to,"recipient")}</td></tr>`).join("")}</table>`:"")+
+    `<p><b>Tangible personal property.</b> ${d.married?"To the surviving Settlor; on the second death, ":""}divided among the beneficiaries as the trustee finds practical, honoring any separate signed memorandum (Probate Code §6132).</p>`+
+    `<p><b>Allocating illiquid or mortgaged property.</b> The trustee may sell any asset, including real property, and allocate cash among the shares, and may divide assets non-pro-rata. The trustee shall not allocate a mortgaged residence or other illiquid asset to a beneficiary's held share unless the trustee provides for its carrying costs, so no share is left short of cash${hasSN?", and shall not place such property in the Supplemental Needs Trust if it would jeopardize the beneficiary's public benefits":""}.</p>`+
+    `<p><b>Residue.</b> The trustee shall divide the rest of the trust estate ${splitText}. Each beneficiary's share is then handled this way:</p>`+
+    `<p class="sub">&bull; <b>Outright</b> beneficiaries (competent adults) receive their share free of trust.</p>`+
+    (hasMinor?`<p class="sub">&bull; <b>Young</b> beneficiaries: held in a sub-trust (below) and paid at the stated ages.</p>`:"")+
+    (hasSN?`<p class="sub">&bull; The <b>special-needs</b> beneficiary's share is held in the Supplemental Needs Trust (below) — never paid outright.</p>`:"")+
+    `<p><b>Beneficiary categories:</b> ${d.bens.length? d.bens.map(b=>`${B(b.name,"name")} — ${({adult:"outright",minor:"young/sub-trust",sn:"special needs"})[b.cat]}`).join("; "): `<span class="blank">[add beneficiaries]</span>`}.</p>`+
+    `<p><b>Ultimate backstop.</b> If no beneficiary or descendant survives to take, the remaining estate goes to ${B(d.backstop,"ultimate backstop beneficiary")}.</p>`;
+
+  // minor subtrust
+  if(hasMinor){
+    arts += H("Sub-trusts for young beneficiaries")+
+      `<p>Until a beneficiary reaches the ages below, the trustee may distribute income and principal for that beneficiary's health, education, maintenance, and support. The trustee shall then distribute principal: one-third at age ${B(d.age1,"age")}, one-half of the remainder at age ${B(d.age2,"age")}, and the balance at age ${B(d.age3,"age")}, ending the sub-trust. A sub-trust under ${B(d.smallTrust,"amount")} may be paid out early if administration is uneconomical. If the beneficiary dies before full distribution, the balance passes to that beneficiary's descendants, or otherwise to the other shares.</p>`;
+  }
+
+  // SNT
+  if(hasSN){
+    const snName=(d.bens.find(b=>b.cat==="sn")||{}).name;
+    const bene=B(snName,"special-needs beneficiary");
+    arts += H("Supplemental (special) needs trust")+
+      `<div class="warnbox"><b>Comprehensive third-party special-needs trust.</b> Before signing, have a California special-needs attorney confirm it fits ${bene}'s specific programs (SSI, SSDI, Medi-Cal, IHSS, and Regional Center benefits each have different rules), and prepare a non-binding <b>Letter of Intent</b> describing ${bene}'s needs, routine, providers, and preferences. Benefit rules change; the trustee applies the rules in effect at the time.</div>`+
+      `<p><b>1. Creation and type.</b> The share set aside for ${bene} (the "Beneficiary") is held in a separate, <b>irrevocable</b> trust for the Beneficiary's <b>sole benefit</b>, managed by ${sntTrustee}. It is a <b>third-party</b> supplemental needs trust funded only with the ${settlorWord.toLowerCase()}' property; it is <b>not</b> a trust described in 42 U.S.C. §1396p(d)(4)(A) and carries <b>no Medicaid/Medi-Cal payback</b>. None of the Beneficiary's own property may ever be added to it.</p>`+
+      `<p><b>2. Intent (controls over every other term).</b> This trust exists to <b>supplement, not supplant</b>, the public benefits a person with a disability may receive — including SSI, SSDI, Medi-Cal, In-Home Supportive Services, Regional Center services, subsidized housing, and similar programs. The ${settlorWord.toLowerCase()} intend that trust assets <b>not be a countable resource</b> and that distributions not be income that reduces or disqualifies those benefits. Any provision that would jeopardize eligibility shall be read — and the trustee shall administer the trust — to carry out this primary intent, even against the literal terms.</p>`+
+      `<p><b>3. Fully discretionary — no enforceable right.</b> The Beneficiary has <b>no right</b> to compel any distribution. The trustee may distribute, in its <b>sole, absolute, and unreviewable discretion</b>, only for the Beneficiary's special and supplemental needs. There is <b>no support (HEMS) standard</b>. The Beneficiary may not assign, pledge, sell, or anticipate any interest, and may not revoke or direct the trust.</p>`+
+      `<p><b>4. Supplemental needs (examples).</b> Goods and services beyond what benefits cover — e.g., uncovered medical, dental, vision, mental-health and therapy services, equipment and supplements; a care manager, advocate, or aide/companion not covered by benefits; education, training, and rehabilitation; recreation, hobbies, travel and vacations (with a companion's reasonable costs); electronics, internet and phone; furniture and household goods; a vehicle and transportation; personal-care items; a service animal and its care; and other things that improve quality of life.</p>`+
+      `<p><b>5. How the trustee distributes (SSI rules).</b> The trustee shall <b>not</b> give cash directly to the Beneficiary (cash is countable income, and retained cash over the SSI resource limit — currently $2,000 — disqualifies). Instead the trustee pays providers and vendors <b>directly</b>, or buys goods the trust or the Beneficiary owns and uses. Distributions used for the Beneficiary's <b>shelter</b> can reduce SSI up to a capped amount (the "presumed maximum value"); under SSA's 2024 rule <b>food is no longer counted</b> as in-kind support. The trustee <b>may still</b> pay for shelter or anything else when, in its judgment, the benefit to the Beneficiary outweighs any reduction in SSI.</p>`+
+      `<p><b>6. ABLE account.</b> The trustee may distribute to a <b>CalABLE</b> (Section 529A) account for the Beneficiary, within the annual ABLE contribution limit, so the Beneficiary can pay qualified disability expenses — including housing — with less effect on benefits.</p>`+
+      `<p><b>7. Trustee — powers and protections.</b> The trustee may apply for, maximize, and advocate for the Beneficiary's benefits; hire a care manager or benefits specialist; acquire and hold a residence or vehicle for the Beneficiary's use; and petition a court for instructions. Acting in good faith to preserve eligibility, the trustee is <b>not liable</b> for any resulting loss or reduction of benefits and may take the Beneficiary's other resources into account. A person who is a <b>remainder beneficiary of this trust shall not serve as its trustee</b>; an independent or professional fiduciary is strongly preferred. The Trust Protector (above) may amend this trust to keep it eligibility-qualified as the law changes.</p>`+
+      `<p><b>8. Spendthrift.</b> To the fullest extent allowed by law, the Beneficiary's interest may not be voluntarily or involuntarily transferred and is not reachable by any creditor — or by any governmental agency providing benefits or seeking reimbursement — before the trustee actually distributes it.</p>`+
+      `<p><b>9. Retirement accounts.</b> If any IRA, Roth, or 401(k) names this trust, it must qualify as a see-through <b>"applicable multi-beneficiary trust"</b> under the SECURE Act so ${bene} keeps the lifetime (not 10-year) payout — confirm the language with the attorney and the plan custodian.</p>`+
+      `<p><b>10. No payback; remainder.</b> Because this trust is third-party funded, on ${bene}'s death the State has <b>no Medi-Cal reimbursement claim</b>, and the remaining balance passes to ${B(d.sntRemainder,"remainder beneficiaries")}, free of trust.</p>`;
+  }
+
+  // trustees
+  arts += H("Trustees and succession")+
+    `<p>${d.married?"The Settlors serve together; on the incapacity or death of one, the other serves alone. ":""}When ${d.married?"neither Settlor":"the Settlor"} can serve, the following serve as successor trustee, in order:</p>`+successorList(d)+
+    `<p>No trustee need post bond. After the ${settlorWord.toLowerCase()} ${d.married?"are":"is"} gone, the Trust Protector &mdash; or a majority of the adult beneficiaries then entitled to distributions &mdash; may remove a non-settlor trustee and appoint an independent successor. A settlor-trustee serves without compensation; any other trustee is entitled to reasonable compensation.</p>`;
+
+  // trust protector
+  arts += H("Trust protector")+
+    `<p>${B(d.protector,"trust protector")} serves as <b>Trust Protector</b> and may appoint a successor in writing. The Trust Protector is not a trustee and holds these powers in a fiduciary capacity: (a) to remove any trustee, with or without cause, and appoint an independent successor; (b) to amend this trust to preserve a beneficiary's eligibility for public benefits or to conform to changes in tax or benefits law &mdash; especially the Supplemental Needs Trust; and (c) to correct a scrivener's error or ambiguity. The Trust Protector may not exercise any power in their own favor or direct distributions to themselves, and is liable only for bad faith. This office matters here because the beneficiaries are minors who could not otherwise remove a trustee for many years.</p>`;
+
+  // powers
+  arts += H("Trustee powers")+
+    `<p>The trustee has all powers granted by the California Probate Code (including §§16220–16249 and the Uniform Prudent Investor Act, §§16045–16054) and all powers an owner would have, without court authorization — to retain, buy, sell, lease, and manage real and personal property; invest; borrow and encumber; operate or sell a business; employ advisors; make distributions in cash or in kind; deal with digital assets (Probate Code §§870–884); and to settle, compromise, contest, or abandon claims, including barring late creditor claims under Probate Code §§19000 et seq.</p>`;
+
+  // general
+  arts += H("General provisions")+
+    `<p><b>Spendthrift:</b> to the extent allowed by Probate Code §§15300–15309, no beneficiary's interest may be transferred or reached by creditors before distribution. <b>Governing law:</b> California; the ${settlorWord.toLowerCase()} ${d.married?"are":"is"} domiciled in ${B(d.county,"county")} County. <b>Survivorship:</b> a beneficiary must survive by 30 days. <b>No-contest:</b> a direct contest brought without probable cause (Probate Code §21310) forfeits that person's interest. <b>Perpetuities:</b> any trust must vest within the period allowed by Probate Code §§21205–21209 (about 90 years). "Descendants"/"by representation" follow Probate Code §240; "children" includes adopted children.</p>`;
+
+  // execution
+  arts += H("Execution")+
+    `<p>The ${settlorWord.toLowerCase()}, as ${settlorWord.toLowerCase()} and initial trustee${d.married?"s":""}, declare that ${we} ${d.married?"have":"have"} read this trust and sign it voluntarily.</p>`+
+    `<p>Executed at ${B(d.county,"city/county")}, California, on ____________________, 20____.</p>`+
+    `<div class="sig"><div class="sigline">${B(d.you,"your name")}, Settlor and Trustee</div>`+
+    (d.married?`<div class="sigline">${B(d.spouse,"spouse's name")}, Settlor and Trustee</div>`:"")+`</div>`+
+    `<div class="note"><b>California notary acknowledgment.</b> "A notary public or other officer completing this certificate verifies only the identity of the individual who signed the document to which this certificate is attached, and not the truthfulness, accuracy, or validity of that document." State of California, County of __________. On __________ before me, __________ (notary), personally appeared ${B(d.you,"your name")}${d.married?` and ${B(d.spouse,"spouse")}`:""}, who proved to me on satisfactory evidence to be the person(s) whose name(s) is/are subscribed, and acknowledged executing it. I certify under PENALTY OF PERJURY under California law that the foregoing is true. WITNESS my hand and official seal. ____________ (Seal)</div>`+
+    `<div class="note">A trust does not require witnesses in California, but notarization is strongly recommended and is required to record real-property deeds.</div>`;
+
+  // schedules
+  arts += `<h2>Schedule A &mdash; trust property</h2>`+
+    `<table><tr><th>#</th><th>Asset</th><th>Character</th><th>Approx. value</th></tr>`+
+    (d.assets.length? d.assets.map((a,i)=>`<tr><td>${i+1}</td><td>${B(a.desc, a.type||"asset")}${a.last4?` (••${esc(a.last4)})`:""}</td><td>${d.married?esc(a.char||"Community"):"—"}</td><td>${esc(a.value||"")}</td></tr>`).join("") : `<tr><td>1</td><td><span class="blank">[add assets]</span></td><td></td><td></td></tr>`)+
+    `</table><p class="note">Real property must be deeded into the trust and recorded; retirement accounts are not retitled — use beneficiary designations.</p>`;
+
+  // ---- pour-over will(s) ----
+  function will(settlorName, otherName){
+    return `<h2>Last will and testament of ${B(settlorName,"name")}</h2>`+
+      `<p>I, ${B(settlorName,"name")}, a resident of ${B(d.county,"county")} County, California, declare this my will and revoke prior wills.</p>`+
+      `<p><b>Pour-over.</b> I give my entire estate, after debts and expenses, to the trustee of ${trustTitle(d)} dated ____________, to be added to and administered under its terms (including later amendments). If that gift fails, I incorporate the trust's terms by reference and direct distribution as if set out here.</p>`+
+      (hasMinor?`<p><b>Guardian of minor children.</b> If ${d.married?`${B(otherName,"spouse")} does not survive me and `:""}any child of mine is a minor, I nominate ${B(d.g1,"guardian")} as guardian of their persons, and if unable, ${B(d.g2,"backup guardian")}. Their inheritance stays in the trust under the successor trustee. No bond required.</p>`:"")+
+      `<p><b>Executor.</b> I nominate ${d.married?`${B(otherName,"spouse")}, and if unable, `:""}${B(d.altExec,"alternate executor")}, to serve without bond under the Independent Administration of Estates Act.</p>`+
+      `<p><b>General.</b> California law governs. A no-contest clause applies to a direct contest without probable cause (Probate Code §21310). A beneficiary must survive me by 30 days.</p>`+
+      `<p>Signed on ____________________, 20____, at ${B(d.county,"city")}, California.</p>`+
+      `<div class="sig"><div class="sigline">${B(settlorName,"name")}, Testator</div></div>`+
+      `<div class="note"><b>Witness attestation (two disinterested witnesses required — Probate Code §6110).</b> The testator declared this to be the will and signed (or acknowledged the signature) in our joint presence; we sign as witnesses in the testator's presence. We are each over 18, the testator appears of sound mind and free of duress, and we declare under penalty of perjury under California law that this is true.<br><br>Witness 1: ____________________ name ____________ address ____________<br><br>Witness 2: ____________________ name ____________ address ____________</div>`;
+  }
+  let wills = `<hr class="pagebreak"><div class="warnbox" style="text-align:center">Pour-over will${d.married?"s":""} — sign separately, each before <b>two disinterested witnesses</b>.</div>`+ will(d.you, d.spouse);
+  if(d.married) wills += `<hr class="pagebreak">`+ will(d.spouse, d.you);
+
+  // ---- certification of trust ----
+  const cert = `<hr class="pagebreak"><h2>Certification of trust (Probate Code §18100.5)</h2>`+
+    `<p>The undersigned trustee certifies: (1) ${trustTitle(d)} exists, dated ____________, and is in effect. (2) The settlor${d.married?"s are":" is"} ${settlorsPhrase(d)}. (3) The acting trustee${d.married?"s are":" is"} ${settlorsPhrase(d)}. (4) The trustee has full power to acquire, hold, manage, sell, encumber, and convey trust assets and to open and operate accounts. (5) The trust is revocable. (6) Title is taken as: <em>"${titleVesting(d)}."</em> (7) The trust has not been revoked or modified in any way making this certification incorrect.</p>`+
+    `<p>I/we declare under penalty of perjury under California law that this is true and that I am/we are all the acting trustee(s).</p>`+
+    `<div class="sig"><div class="sigline">${B(d.you,"your name")}, Trustee</div>`+(d.married?`<div class="sigline">${B(d.spouse,"spouse")}, Trustee</div>`:"")+`</div>`+
+    `<div class="note">Hand banks and title companies this certification — not the whole trust. Fill in your SSN by hand where a TIN is requested; don't store it in this tool.</div>`;
+
+  // ---- cover ----
+  const cover = `<h1>${trustTitle(d)}</h1><div class="docsub">Working draft &mdash; California revocable living trust package &middot; prepared with a self-help tool</div>`+
+    `<div class="warnbox"><b>Not legal advice. Unsigned draft.</b> Have a California estate attorney review this — especially the special-needs trust${hasSN?"":" (if added)"}. It takes effect only when (1) signed &amp; notarized (and the will${d.married?"s":""} signed before two witnesses) and (2) <b>funded</b> — your home deeded in and accounts retitled. Highlighted <span class="blank">[items]</span> still need to be filled in.</div>`+
+    `<h3>Contents</h3>`+
+    `<ol class="toc">`+
+      `<li><a href="#sec-trust"><b>The revocable living trust</b> &mdash; the main document (all articles &amp; Schedule A)</a></li>`+
+      `<li><a href="#sec-wills">Pour-over will${d.married?"s (one per spouse)":""}</a></li>`+
+      `<li><a href="#sec-cert">Certification of trust &mdash; the short page you hand to banks</a></li>`+
+      `<li><a href="#sec-assignment">Assignment of personal property</a></li>`+
+      `<li><a href="#sec-funding">Funding &amp; execution checklist</a></li>`+
+      `<li><a href="#sec-maintenance">Trust maintenance cheat-sheet</a></li>`+
+    `</ol>`+
+    `<p class="note">Each part begins on a new page and the order above never changes. We don't print fixed page numbers because they shift with what you enter &mdash; but <b>part 1, the revocable living trust, is the main document</b> you'll have reviewed, signed, and notarized. (On screen, click any line above to jump to it.)</p>`+
+    `<h3>How to make it real (after filling this in)</h3>`+
+    `<p>1. Have an attorney review it. &nbsp; 2. Sign &amp; notarize the trust; sign the will${d.married?"s":""} before two disinterested witnesses. &nbsp; 3. Fund it: record a grant deed moving real property into the trust (no reassessment — Rev. &amp; Tax. Code §62(d); no transfer tax — §11930), retitle bank/brokerage accounts, and set retirement/insurance beneficiaries (never name a special-needs beneficiary directly). &nbsp; 4. Keep the signed originals safe and tell your successor trustee where they are. The full <b>funding &amp; execution checklist</b>, a <b>personal-property assignment</b>, and a <b>maintenance guide</b> are at the end of this document.</p>`+
+    `<hr class="pagebreak">`;
+
+  // ---- appendices: assignment, funding & execution, maintenance ----
+  const assignment = `<hr class="pagebreak"><h2>Assignment of personal property to the trust</h2>`+
+    `<p>For valuable consideration and to fund their living trust, ${settlorsPhrase(d)} (the "Assignor${d.married?"s":""}") transfer and assign to the trustee of ${trustTitle(d)} dated ____________ all of their right, title, and interest in their <b>tangible personal property</b> that has no certificate of title or registration — household furniture and furnishings, appliances, clothing, jewelry, books, artwork, collectibles, tools, sporting goods, electronics, and personal effects, wherever located.</p>`+
+    `<p>The Assignor${d.married?"s":""} keep the right to use this property and to amend or revoke this assignment while the trust is revocable. Property requiring a deed, certificate of title, or account retitling is transferred by those separate instruments, not by this assignment.</p>`+
+    `<p>Dated ____________________, 20____, at ${B(d.county,"city")}, California.</p>`+
+    `<div class="sig"><div class="sigline">${B(d.you,"your name")}, Assignor</div>`+(d.married?`<div class="sigline">${B(d.spouse,"spouse's name")}, Assignor</div>`:"")+`</div>`;
+
+  const realProps = d.assets.filter(a=>a.type==="Real property");
+  const acctList = d.assets.filter(a=>a.type==="Bank account"||a.type==="Brokerage account");
+  const snWarn = hasSN ? ` <b>Never name your special-needs beneficiary directly</b> — name the Supplemental Needs Trust, or you risk disqualifying them from SSI/Medi-Cal.` : "";
+
+  const funding = `<hr class="pagebreak"><h2>Funding &amp; execution checklist</h2>`+
+    `<div class="warnbox">A signed trust that owns nothing does nothing. Two jobs make it work: <b>execute</b> it (sign correctly) and <b>fund</b> it (retitle assets). Don't skip funding — it's the #1 failure.</div>`+
+    `<h3>1. Execution — signing it correctly</h3>`+
+    `<table><tr><th>Document</th><th>Who signs</th><th>Witnesses?</th><th>Notary?</th></tr>`+
+    `<tr><td>Revocable living trust</td><td>${d.married?"both spouses":"you"}</td><td>Not required</td><td>Yes — recommended (required to record deeds)</td></tr>`+
+    `<tr><td>Pour-over will${d.married?"s":""}</td><td>${d.married?"each spouse, own will":"you"}</td><td><b>Yes — 2 disinterested witnesses, together</b></td><td>Optional</td></tr>`+
+    `<tr><td>Certification of trust</td><td>trustee(s)</td><td>No</td><td>Yes</td></tr>`+
+    `<tr><td>Assignment of personal property</td><td>${d.married?"both spouses":"you"}</td><td>No</td><td>Optional</td></tr></table>`+
+    `<ul class="ck"><li>&#9744; Will witnesses must watch you sign at the same time and must inherit nothing under the will or trust (Probate Code §§6110, 6112).</li>`+
+    `<li>&#9744; Notarize the trust; keep a signed original somewhere safe and tell your successor trustee where it is.</li></ul>`+
+    `<h3>2. Funding — retitle each asset to the trust</h3>`+
+    `<p>Use this owner name: <em>"${titleVesting(d)}."</em></p>`+
+    `<h4>Real estate${realProps.length?"":" (if any)"}</h4>`+
+    (realProps.length?`<p>${realProps.map(a=>esc(a.desc||"your property")).join("; ")}</p>`:"")+
+    `<ul class="ck"><li>&#9744; Record a <b>grant deed</b> from you to the trustee(s) at the county recorder; file a Preliminary Change of Ownership Report (PCOR).</li>`+
+    `<li>&#9744; <b>No reassessment</b> (Rev. &amp; Tax. Code §62(d)) and <b>no documentary transfer tax</b> (§11930).</li>`+
+    `<li>&#9744; Transfer into your own revocable trust does <b>not</b> trigger a due-on-sale clause (Garn–St. Germain Act); notify the lender and insurer to name the trust. A condo transfers by the same grant deed — tell the HOA the new owner of record.</li></ul>`+
+    (d.married?`<p class="note"><b>Community-property step-up &mdash; important if you hold the home in joint tenancy.</b> Deeding a joint-tenancy home into the trust does not make it community property, so it can miss the double step-up in basis. To secure that benefit, sign a written <b>transmutation / community-property agreement</b> (Family Code §852) with an attorney.</p>`:"")+
+    `<h4>Bank &amp; brokerage accounts</h4>`+
+    (acctList.length?`<p>${acctList.map(a=>esc(a.desc||a.type)+(a.last4?` (••${esc(a.last4)})`:"")).join("; ")}</p>`:"")+
+    `<ul class="ck"><li>&#9744; Retitle each non-retirement account into the trust (the institution has a form; show them the Certification of Trust).</li></ul>`+
+    `<h4>Accounts handled by beneficiary designation — do NOT retitle these</h4>`+
+    `<ul class="ck"><li>&#9744; <b>Retirement (401(k), IRA, Roth IRA):</b> leave the owner as the individual — retitling triggers tax. Set the <b>beneficiary</b>: spouse primary, then the trust/sub-trust for the kids.${snWarn} The trust should be a "see-through" trust, and the SECURE Act 10-year payout rule applies (a disabled beneficiary can stretch over life expectancy). Confirm with an advisor.</li>`+
+    `<li>&#9744; <b>Life insurance &amp; annuities:</b> set beneficiaries per your plan (often the trust).${hasSN?" Not the special-needs beneficiary directly.":""}</li>`+
+    `<li>&#9744; <b>529 college plans:</b> don't retitle into the trust — name a <b>successor account owner</b>.</li>`+
+    `<li>&#9744; <b>UTMA/UGMA custodial accounts:</b> already legally the child's — keep them out of your trust; just name a <b>successor custodian</b>.</li></ul>`+
+    `<h4>Other</h4>`+
+    `<ul class="ck"><li>&#9744; Vehicles: usually fine to leave in your name (California offers DMV transfer-on-death).</li>`+
+    `<li>&#9744; Business interests: assign LLC/corporate/partnership interests to the trust, consistent with any operating or buy-sell agreement.</li>`+
+    `<li>&#9744; Digital assets: list accounts and where credentials are kept; the trust grants fiduciary access under Probate Code §§870–884.</li></ul>`+
+    `<h3>3. Debts &amp; liabilities</h3>`+
+    `<ul class="ck"><li>&#9744; Check each debt: a <b>joint</b> account holder/co-signer stays liable; an <b>authorized user</b> does not.${d.married?" (In California, debts during marriage are generally community debts regardless of whose name is on them.)":""}</li>`+
+    `<li>&#9744; Size <b>life insurance</b> to your mortgage + debts so your family keeps assets free and clear.</li>`+
+    `<li>&#9744; Secured property passes <b>subject to</b> its loan (Prob. Code §21131) — whoever keeps it keeps paying.</li>`+
+    `<li>&#9744; Your trustee can bar late creditor claims (Prob. Code §§19000+).</li></ul>`+
+    `<h3>4. Selling or buying property later</h3>`+
+    `<ul class="ck"><li>&#9744; Sell <b>as trustee</b>; keep proceeds in a trust-titled account. You keep the home-sale capital-gains exclusion (IRC §121).</li>`+
+    `<li>&#9744; Buy in the trust's name — or record a grant deed into the trust right after closing if the lender made you close individually.</li>`+
+    `<li>&#9744; Update Schedule A. <b>A new house isn't "done" until its deed names the trust</b> — otherwise it can go through probate.</li></ul>`+
+    `<h3>5. After signing — keep it working</h3>`+
+    `<ul class="ck"><li>&#9744; Store the signed originals safely; hand institutions the Certification of Trust, not the whole trust.</li>`+
+    `<li>&#9744; Tell your successor trustee${hasMinor?" and guardian":""} they're named and where the documents are.</li>`+
+    `<li>&#9744; Review every 3–5 years and after any birth, death, marriage, divorce, big asset change, or move.</li></ul>`+
+    `<h3>Recommended companions (not included here)</h3>`+
+    `<p>For ${d.married?"each spouse":"you"}: an <b>Advance Health Care Directive</b> (Probate Code §4701), a <b>Durable Power of Attorney for finances</b>, and a <b>HIPAA authorization</b> — these cover incapacity, which the trust only partly handles.</p>`;
+
+  const maintenance = `<hr class="pagebreak"><h2>Trust maintenance — cheat sheet</h2>`+
+    `<p><b>The 30-second version:</b> fund it once, title big new things in its name as you get them, and glance at it every few years. No annual filing, no fee, no registration, no separate tax return while you're ${d.married?"both ":""}alive.</p>`+
+    `<h3>Do once</h3><ul class="ck"><li>&#9744; Fund it (deed real property in; retitle accounts; set beneficiary designations). An unfunded trust does nothing.</li><li>&#9744; Store originals; tell your successor trustee${hasMinor?" and guardian":""} where they are.</li></ul>`+
+    `<h3>Do only when something changes</h3>`+
+    `<table><tr><th>When</th><th>Do this</th></tr>`+
+    `<tr><td>Buy real property</td><td>Take title in the trust's name (or deed it in right after closing)</td></tr>`+
+    `<tr><td>Sell a trust property</td><td>Sign as trustee; keep proceeds in a trust account</td></tr>`+
+    `<tr><td>Open a new bank/brokerage account</td><td>Open it in the trust's name</td></tr>`+
+    `<tr><td>Retirement / insurance / 529 / UTMA</td><td>Set or refresh the beneficiary or successor — ${hasSN?"never the special-needs child directly":"coordinate with the trust"}</td></tr>`+
+    `<tr><td>A bank wants proof</td><td>Hand them the Certification of Trust, not the whole trust</td></tr></table>`+
+    `<h3>Every 1–3 years, or after a life event</h3>`+
+    `<ul class="ck"><li>&#9744; Are your successor trustee${hasMinor?" and guardian":""} still the right people?</li>`+
+    `<li>&#9744; Beneficiary designations still correct and coordinated with the trust?</li>`+
+    `<li>&#9744; Any big new asset not yet titled in the trust? Schedule A current?</li></ul>`+
+    `<h3>How to change it</h3>`+
+    `<p>Small change: a one-page <b>amendment</b>, signed and notarized — you don't redo the trust. Many changes: a full <b>restatement</b> (same trust name/date, new terms). For anything touching the special-needs trust, use an attorney.</p>`+
+    `<h3>What you never have to do</h3>`+
+    `<p>No separate tax return while ${d.married?"you're both":"you're"} alive (grantor trust, uses your SSN), no EIN, no state registration, no annual report or fee, no renewal, and no amendment just because you bought or sold assets.</p>`;
+
+  return cover
+    + `<a id="sec-trust"></a>` + arts
+    + `<a id="sec-wills"></a>` + wills
+    + `<a id="sec-cert"></a>` + cert
+    + `<a id="sec-assignment"></a>` + assignment
+    + `<a id="sec-funding"></a>` + funding
+    + `<a id="sec-maintenance"></a>` + maintenance;
+}
+
+/* ---------- glue ---------- */
+let saveTimer=null;
+function update(){
+  const d = collect();
+  $("spouseWrap").style.display = d.married?"block":"none";
+  const hasMinor = d.bens.some(b=>b.cat==="minor");
+  const hasSN = d.bens.some(b=>b.cat==="sn");
+  $("guardianWrap").style.display = hasMinor?"block":"none";
+  $("snWrap").style.display = hasSN?"block":"none";
+  $("sntTrustee").style.display = ($("sntSame").value==="no")?"block":"none";
+  $("splitCustom").style.display = ($("split").value==="custom")?"block":"none";
+  $("paper").innerHTML = buildDoc(d);
+  // missing-required hint
+  const need=[];
+  if(!d.you.trim()) need.push("your name");
+  if(d.married && !d.spouse.trim()) need.push("spouse's name");
+  if(!d.surname.trim()) need.push("trust surname");
+  if(!d.bens.length) need.push("at least one beneficiary");
+  if(!d.st1.trim()) need.push("successor trustee");
+  if(hasMinor && !d.g1.trim()) need.push("guardian");
+  if(hasSN && !d.sntRemainder.trim()) need.push("special-needs remainder");
+  $("missing").innerHTML = need.length? "Still to fill: "+need.join(", ") : "All key fields filled ✓";
+  save();
+}
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{
+      const d=collect();
+      localStorage.setItem("catrust", JSON.stringify({d, bens, assets, gifts,
+        fields:["you","spouse","county","surname","st1","st2","st3","altExec","g1","g2","sntSame","sntTrustee","sntRemainder","backstop","protector","split","splitCustom","age1","age2","age3","smallTrust"].reduce((o,k)=>(o[k]=$(k).value,o),{}),
+        married:d.married}));
+      $("saveState").textContent="saved in your browser ✓";
+    }catch(e){ $("saveState").textContent="(couldn't save locally)"; }
+  },300);
+}
+function restore(obj){
+  if(!obj) return;
+  const f=obj.fields||{};
+  Object.keys(f).forEach(k=>{ if($(k)) $(k).value=f[k]; });
+  document.querySelector(`input[name=married][value=${obj.married?"yes":"no"}]`).checked=true;
+  bens=obj.bens||[]; assets=obj.assets||[]; gifts=obj.gifts||[];
+  renderBens(); renderAssets(); renderGifts();
+}
+
+const SAMPLE = {
+  fields:{you:"Jordan Alex Rivera",spouse:"Sam Taylor Rivera",county:"Orange",surname:"Rivera",
+    st1:"Maria Lopez (sister)",st2:"James Rivera (brother)",st3:"a licensed professional fiduciary",
+    altExec:"Maria Lopez (sister)",g1:"Maria Lopez (sister)",g2:"James Rivera (brother)",
+    sntSame:"yes",sntTrustee:"",sntRemainder:"my other child, in their sub-trust",
+    backstop:"my and my spouse's heirs at law",protector:"Dana Kim (trusted family friend)",split:"equal",splitCustom:"",age1:"25",age2:"30",age3:"35",smallTrust:"$50,000"},
+  married:true,
+  bens:[{name:"Alex Rivera",year:"2017",cat:"minor"},{name:"Casey Rivera",year:"2018",cat:"sn"}],
+  assets:[{type:"Real property",last4:"",desc:"Condominium at 12 Palm Ct, Irvine, CA; APN 123-456-78",value:"$650,000",char:"Community"},
+    {type:"Bank account",last4:"4821",desc:"Chase checking",value:"$25,000",char:"Community"},
+    {type:"Brokerage account",last4:"9017",desc:"Fidelity brokerage",value:"$180,000",char:"Community"}],
+  gifts:[]
+};
+
+/* events */
+$("form").addEventListener("input", e=>{
+  const t=e.target;
+  if(t.dataset && t.dataset.list){
+    const arr={ben:bens,asset:assets,gift:gifts}[t.dataset.list];
+    arr[+t.dataset.i][t.dataset.k]=t.value;
+    if(t.dataset.k==="cat") update();        // re-show guardian/SNT
+  }
+  update();
+});
+$("form").addEventListener("change", update);
+$("bens").addEventListener("click",e=>{}); // delegation handled below
+document.addEventListener("click", e=>{
+  const t=e.target;
+  if(t.id==="addBen"){ bens.push({name:"",year:"",cat:"minor"}); renderBens(); update(); }
+  if(t.id==="addAsset"){ assets.push({type:"Bank account",last4:"",desc:"",value:"",char:"Community"}); renderAssets(); update(); }
+  if(t.id==="addGift"){ gifts.push({what:"",to:""}); renderGifts(); update(); }
+  if(t.dataset && t.dataset.rm){
+    const i=+t.dataset.i;
+    if(t.dataset.rm==="ben"){ bens.splice(i,1); renderBens(); }
+    if(t.dataset.rm==="asset"){ assets.splice(i,1); renderAssets(); }
+    if(t.dataset.rm==="gift"){ gifts.splice(i,1); renderGifts(); }
+    update();
+  }
+  if(t.id==="loadDemo"){ restore(SAMPLE); update(); }
+  if(t.id==="clearBtn"){ if(confirm("Clear everything and start over?")){ localStorage.removeItem("catrust"); bens=[];assets=[];gifts=[];
+      ["you","spouse","county","surname","st1","st2","st3","altExec","g1","g2","sntTrustee","sntRemainder","backstop","protector","splitCustom"].forEach(k=>$(k).value="");
+      $("split").value="equal";$("sntSame").value="yes";$("age1").value="25";$("age2").value="30";$("age3").value="35";$("smallTrust").value="$50,000";
+      document.querySelector('input[name=married][value=no]').checked=true;
+      renderBens();renderAssets();renderGifts();update(); } }
+});
+$("ack").addEventListener("change", e=>{ $("printBtn").disabled = !e.target.checked; });
+$("printBtn").addEventListener("click", ()=> window.print());
+
+/* init */
+(function init(){
+  const params=new URLSearchParams(location.search);
+  if(params.get("demo")==="1"){ restore(SAMPLE); }
+  else { try{ restore(JSON.parse(localStorage.getItem("catrust"))); }catch(e){} }
+  if(!bens.length && params.get("demo")!=="1"){ bens=[{name:"",year:"",cat:"minor"}]; renderBens(); }
+  update();
+})();
+</script>
+</body>
+</html>
